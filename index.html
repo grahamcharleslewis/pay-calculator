@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UK Pay Calculator</title>
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --card: #ffffff;
+      --text: #1f2933;
+      --muted: #616e7c;
+      --border: #cbd2d9;
+      --accent: #1d4ed8;
+      --accent-hover: #1e40af;
+      --radius: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 2rem 1rem;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    main {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin: 0 0 0.25rem;
+      font-size: 1.75rem;
+    }
+
+    .subtitle {
+      margin: 0 0 1.5rem;
+      color: var(--muted);
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .field {
+      margin-bottom: 1.25rem;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.35rem;
+    }
+
+    .hint {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 0.35rem;
+    }
+
+    .input-wrap {
+      position: relative;
+    }
+
+    .input-wrap .prefix {
+      position: absolute;
+      left: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      pointer-events: none;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      padding: 0.6rem 0.75rem;
+      font-size: 1rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: #fff;
+      color: var(--text);
+    }
+
+    .input-wrap.currency input {
+      padding-left: 1.75rem;
+    }
+
+    .input-wrap.suffix input {
+      padding-right: 2rem;
+    }
+
+    .input-wrap .suffix-text {
+      position: absolute;
+      right: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      pointer-events: none;
+    }
+
+    select {
+      width: 100%;
+      padding: 0.6rem 0.75rem;
+      font-size: 1rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: #fff;
+      color: var(--text);
+    }
+
+    .field.checkbox {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .field.checkbox label {
+      margin: 0;
+      font-weight: 400;
+    }
+
+    .field.checkbox input {
+      width: 1.1rem;
+      height: 1.1rem;
+      margin: 0;
+    }
+
+    input[type="number"]:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.15);
+    }
+
+    button {
+      width: 100%;
+      padding: 0.7rem 1rem;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #fff;
+      background: var(--accent);
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: var(--accent-hover);
+    }
+
+    #results {
+      margin-top: 1.5rem;
+    }
+
+    #results h2 {
+      margin: 0 0 1rem;
+      font-size: 1.25rem;
+    }
+
+    #results .card + .card {
+      margin-top: 1.5rem;
+    }
+
+    .table-scroll {
+      overflow-x: auto;
+    }
+
+    table.compare {
+      font-size: 0.9rem;
+    }
+
+    table.compare th, table.compare td {
+      white-space: nowrap;
+    }
+
+    tr.section td {
+      border-top: 2px solid var(--border);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-variant-numeric: tabular-nums;
+    }
+
+    th, td {
+      padding: 0.5rem 0.4rem;
+      text-align: right;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th:first-child, td:first-child {
+      text-align: left;
+    }
+
+    thead th {
+      font-size: 0.85rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    tr.total td {
+      font-weight: 700;
+      border-bottom: none;
+    }
+
+    .deduction {
+      color: #b91c1c;
+    }
+
+    .note {
+      margin: 1rem 0 0;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .error {
+      color: #b91c1c;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Pay Calculator</h1>
+
+    <form id="pay-form" class="card" novalidate>
+      <div class="field">
+        <label for="annual-income">Annual income</label>
+        <div class="input-wrap currency">
+          <span class="prefix">£</span>
+          <input type="number" id="annual-income" name="annualIncome"
+                 min="0" step="0.01" inputmode="decimal" placeholder="0.00" required>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="retention-allowance">Annual retention allowance</label>
+        <div class="input-wrap currency">
+          <span class="prefix">£</span>
+          <input type="number" id="retention-allowance" name="retentionAllowance"
+                 min="0" step="0.01" inputmode="decimal" placeholder="0.00">
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="weekly-hours">Contracted weekly hours</label>
+        <div class="input-wrap">
+          <input type="number" id="weekly-hours" name="weeklyHours"
+                 min="0" max="168" step="0.01" inputmode="decimal" value="37" required>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="working-days">Working days per week</label>
+        <span class="hint">Used to work out the effect of dropping days</span>
+        <div class="input-wrap">
+          <input type="number" id="working-days" name="workingDays"
+                 min="1" max="7" step="0.5" inputmode="decimal" value="5" required>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="annual-leave">Annual leave (days per year)</label>
+        <span class="hint">Your full entitlement, including bank holidays if they're part of it</span>
+        <div class="input-wrap">
+          <input type="number" id="annual-leave" name="annualLeave"
+                 min="0" max="366" step="0.5" inputmode="decimal" value="25">
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="pension-percent">Pension contribution</label>
+        <span class="hint">Your contribution as a percentage of pensionable pay</span>
+        <div class="input-wrap suffix">
+          <input type="number" id="pension-percent" name="pensionPercent"
+                 min="0" max="100" step="0.01" inputmode="decimal" value="7.35">
+          <span class="suffix-text">%</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="pension-method">Pension scheme type</label>
+        <select id="pension-method" name="pensionMethod">
+          <option value="netpay">Net pay arrangement (deducted before tax)</option>
+          <option value="sacrifice">Salary sacrifice (deducted before tax and NI)</option>
+          <option value="ras">Relief at source (deducted after tax)</option>
+        </select>
+      </div>
+
+      <div class="field checkbox">
+        <input type="checkbox" id="pension-include-retention" name="pensionIncludeRetention">
+        <label for="pension-include-retention">Retention allowance is pensionable</label>
+      </div>
+
+      <button type="submit">Calculate</button>
+    </form>
+
+    <section id="results" aria-live="polite"></section>
+  </main>
+
+  <script>
+    // 2026/27 rates for England, Wales and Northern Ireland.
+    const TAX_YEAR = {
+      label: '2026/27',
+      incomeTax: {
+        personalAllowance: 12570,
+        allowanceTaperThreshold: 100000, // allowance reduces by £1 for every £2 above this
+        // Bands apply to taxable income (after the personal allowance)
+        bands: [
+          { upTo: 37700, rate: 0.20 },   // basic
+          { upTo: 125140, rate: 0.40 },  // higher
+          { upTo: Infinity, rate: 0.45 } // additional
+        ]
+      },
+      nationalInsurance: {
+        primaryThreshold: 12570,
+        upperEarningsLimit: 50270,
+        mainRate: 0.08,
+        upperRate: 0.02
+      }
+    };
+
+    function personalAllowance(grossIncome) {
+      const { personalAllowance, allowanceTaperThreshold } = TAX_YEAR.incomeTax;
+      const excess = Math.max(0, grossIncome - allowanceTaperThreshold);
+      return Math.max(0, personalAllowance - Math.floor(excess / 2));
+    }
+
+    function incomeTax(grossIncome) {
+      const taxable = Math.max(0, grossIncome - personalAllowance(grossIncome));
+      let tax = 0;
+      let lower = 0;
+      for (const band of TAX_YEAR.incomeTax.bands) {
+        if (taxable <= lower) break;
+        tax += (Math.min(taxable, band.upTo) - lower) * band.rate;
+        lower = band.upTo;
+      }
+      return tax;
+    }
+
+    function nationalInsurance(grossIncome) {
+      const { primaryThreshold, upperEarningsLimit, mainRate, upperRate } = TAX_YEAR.nationalInsurance;
+      const mainBand = Math.max(0, Math.min(grossIncome, upperEarningsLimit) - primaryThreshold);
+      const upperBand = Math.max(0, grossIncome - upperEarningsLimit);
+      return mainBand * mainRate + upperBand * upperRate;
+    }
+
+    // Annual pay breakdown. Retention allowance is treated as taxable, NI-able pay.
+    function calculatePay({ annualIncome, retentionAllowance, pensionPercent, pensionMethod, pensionIncludesRetention }) {
+      const gross = annualIncome + retentionAllowance;
+      const pensionablePay = annualIncome + (pensionIncludesRetention ? retentionAllowance : 0);
+      const pension = pensionablePay * pensionPercent / 100;
+
+      let taxablePay = gross;
+      let niablePay = gross;
+      let pensionDeduction = pension;
+      switch (pensionMethod) {
+        case 'netpay':
+          taxablePay = gross - pension;
+          break;
+        case 'sacrifice':
+          taxablePay = gross - pension;
+          niablePay = gross - pension;
+          break;
+        case 'ras':
+          // Provider claims basic-rate relief, so only 80% comes out of pay
+          pensionDeduction = pension * (1 - TAX_YEAR.incomeTax.bands[0].rate);
+          break;
+      }
+
+      const tax = incomeTax(taxablePay);
+      const ni = nationalInsurance(niablePay);
+      const net = gross - pensionDeduction - tax - ni;
+
+      return { gross, pension, pensionDeduction, taxablePay, tax, ni, net };
+    }
+
+    const gbp = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' });
+    const pct = new Intl.NumberFormat('en-GB', { style: 'percent', maximumFractionDigits: 1 });
+    const num = new Intl.NumberFormat('en-GB', { maximumFractionDigits: 2 });
+
+    window.onload = function () {
+      const form = document.getElementById('pay-form');
+      const annualIncomeInput = document.getElementById('annual-income');
+      const retentionAllowanceInput = document.getElementById('retention-allowance');
+      const weeklyHoursInput = document.getElementById('weekly-hours');
+      const workingDaysInput = document.getElementById('working-days');
+      const annualLeaveInput = document.getElementById('annual-leave');
+      const pensionPercentInput = document.getElementById('pension-percent');
+      const pensionMethodInput = document.getElementById('pension-method');
+      const pensionIncludeRetentionInput = document.getElementById('pension-include-retention');
+      const results = document.getElementById('results');
+
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const annualIncome = parseFloat(annualIncomeInput.value) || 0;
+        const retentionAllowance = parseFloat(retentionAllowanceInput.value) || 0;
+        const weeklyHours = parseFloat(weeklyHoursInput.value) || 0;
+        const workingDays = parseFloat(workingDaysInput.value) || 0;
+        const annualLeave = parseFloat(annualLeaveInput.value) || 0;
+        const pensionPercent = parseFloat(pensionPercentInput.value) || 0;
+        const pensionMethod = pensionMethodInput.value;
+
+        if (annualIncome < 0 || retentionAllowance < 0 || weeklyHours < 0 || annualLeave < 0 || pensionPercent < 0) {
+          results.innerHTML = '<p class="card error">Values cannot be negative.</p>';
+          return;
+        }
+        if (pensionPercent > 100) {
+          results.innerHTML = '<p class="card error">Pension contribution cannot exceed 100%.</p>';
+          return;
+        }
+
+        if (workingDays < 1 || workingDays > 7) {
+          results.innerHTML = '<p class="card error">Working days per week must be between 1 and 7.</p>';
+          return;
+        }
+
+        const payInputs = {
+          annualIncome,
+          retentionAllowance,
+          pensionPercent,
+          pensionMethod,
+          pensionIncludesRetention: pensionIncludeRetentionInput.checked
+        };
+        const { gross, pension, pensionDeduction, taxablePay, tax, ni, net } = calculatePay(payInputs);
+
+        // Pro-rata scenarios: income scales with days worked, and optionally the retention allowance too
+        const buildScenarios = retentionProRata => [0, 1, 2, 3]
+          .filter(dropped => workingDays - dropped > 0)
+          .map(dropped => {
+            const ratio = (workingDays - dropped) / workingDays;
+            return {
+              dropped,
+              days: workingDays - dropped,
+              hours: weeklyHours * ratio,
+              leaveDays: annualLeave * ratio,
+              // Each day's length is unchanged, so leave hours scale with leave days
+              leaveHours: annualLeave * ratio * (weeklyHours / workingDays),
+              ratio,
+              ...calculatePay({
+                ...payInputs,
+                annualIncome: annualIncome * ratio,
+                retentionAllowance: retentionProRata ? retentionAllowance * ratio : retentionAllowance
+              })
+            };
+          });
+
+        const pensionNote = pensionMethod === 'ras' && pension > 0
+          ? ` Relief at source: ${gbp.format(pension)} a year goes into your pension, including
+              basic-rate relief added by the provider. Higher or additional-rate taxpayers can
+              claim further relief through Self Assessment, which isn't included here.`
+          : '';
+
+        const row = (label, annual, cls) => `
+          <tr class="${cls || ''}">
+            <td>${label}</td>
+            <td>${gbp.format(annual)}</td>
+            <td>${gbp.format(annual / 12)}</td>
+            <td>${gbp.format(annual / 52)}</td>
+          </tr>`;
+
+        results.innerHTML = `
+          <div class="card">
+            <h2>Your pay (${TAX_YEAR.label})</h2>
+            <table>
+              <thead>
+                <tr><th></th><th>Year</th><th>Month</th><th>Week</th></tr>
+              </thead>
+              <tbody>
+                ${row('Gross pay', gross)}
+                ${row('Pension', -pensionDeduction, 'deduction')}
+                ${row('Income tax', -tax, 'deduction')}
+                ${row('National Insurance', -ni, 'deduction')}
+                ${row('Take-home pay', net, 'total')}
+              </tbody>
+            </table>
+            <p class="note">
+              Personal allowance: ${gbp.format(personalAllowance(taxablePay))}.
+              Rates for England, Wales and Northern Ireland. Employee Class 1 NI
+              is calculated on an annual basis.${pensionNote}
+            </p>
+          </div>
+          ${compareTable(
+            buildScenarios(true),
+            retentionAllowance > 0 ? 'Dropping days: retention allowance pro rata' : 'Dropping days (pro rata)',
+            'Annual income and retention allowance are reduced in proportion to days worked.'
+          )}
+          ${retentionAllowance > 0 ? compareTable(
+            buildScenarios(false),
+            'Dropping days: retention allowance fixed',
+            'Annual income is reduced in proportion to days worked; the retention allowance stays at its full value.'
+          ) : ''}`;
+      });
+
+      function compareTable(scenarios, title, basis) {
+        const current = scenarios[0];
+        const heading = s => s.dropped === 0 ? 'Current' : `−${s.dropped} day${s.dropped > 1 ? 's' : ''}`;
+        const cells = fn => scenarios.map(s => `<td>${fn(s)}</td>`).join('');
+        const row = (label, fn, cls) => `<tr class="${cls || ''}"><td>${label}</td>${cells(fn)}</tr>`;
+        const change = s => s.dropped === 0 ? '–' : gbp.format((s.net - current.net) / 12);
+        const share = s => current.net > 0 ? pct.format(s.net / current.net) : '–';
+
+        return `
+          <div class="card">
+            <h2>${title}</h2>
+            <div class="table-scroll">
+              <table class="compare">
+                <thead>
+                  <tr><th></th>${scenarios.map(s => `<th>${heading(s)}</th>`).join('')}</tr>
+                </thead>
+                <tbody>
+                  ${row('Days per week', s => num.format(s.days))}
+                  ${row('Hours per week', s => num.format(s.hours))}
+                  ${current.leaveDays > 0 ? row('Annual leave (days)', s => num.format(s.leaveDays)) : ''}
+                  ${current.leaveHours > 0 ? row('Annual leave (hours)', s => num.format(s.leaveHours)) : ''}
+                  ${row('Gross pay', s => gbp.format(s.gross), 'section')}
+                  ${row('Pension', s => gbp.format(-s.pensionDeduction), 'deduction')}
+                  ${row('Income tax', s => gbp.format(-s.tax), 'deduction')}
+                  ${row('National Insurance', s => gbp.format(-s.ni), 'deduction')}
+                  ${row('Take-home (year)', s => gbp.format(s.net), 'total')}
+                  ${row('Take-home (month)', s => gbp.format(s.net / 12), 'section')}
+                  ${row('Change per month', change, 'deduction')}
+                  ${row('Pay worked', s => pct.format(s.ratio))}
+                  ${row('Take-home kept', share)}
+                </tbody>
+              </table>
+            </div>
+            <p class="note">
+              ${basis}
+              Pension contributions stay at the same percentage of the reduced pay.
+              ${current.leaveDays > 0 ? 'Annual leave is reduced in proportion to days worked.' : ''}
+            </p>
+          </div>`;
+      }
+    };
+  </script>
+</body>
+</html>
