@@ -1,6 +1,6 @@
 # Pay Calculator
 
-A UK take-home pay calculator in a single, self-contained web page. Open `index.html` in any modern browser — there is nothing to install, build or serve, and no data leaves the page.
+A UK take-home pay calculator in a single, self-contained web page. Open `index.html` in any modern browser - there is nothing to install, build or serve, and no data leaves the page.
 
 It works out income tax, National Insurance and pension deductions for a salary plus an optional retention allowance, then shows what happens to pay and annual leave if you drop 1, 2 or 3 working days a week.
 
@@ -8,10 +8,10 @@ It works out income tax, National Insurance and pension deductions for a salary 
 
 | Field | Default | Notes |
 |---|---|---|
-| Annual income | – | Basic salary before any deductions. |
-| Annual retention allowance | – | Optional. Treated as taxable, NI-able pay. |
+| Annual income | - | Basic salary before any deductions. |
+| Annual retention allowance | - | Optional. Treated as taxable, NI-able pay. |
 | Contracted weekly hours | 37 | Used for the hours rows in the drop-days tables. |
-| Working days per week | 5 | 1–7, half days allowed. Defines what "one day" is as a share of the week. |
+| Working days per week | 5 | 1-7, half days allowed. Defines what "one day" is as a share of the week. |
 | Annual leave (days per year) | 25 | Full entitlement for the current pattern. Include bank holidays if your contract includes them. |
 | Pension contribution | 7.35% | Employee contribution as a percentage of pensionable pay. |
 | Pension scheme type | Net pay | Net pay arrangement, salary sacrifice or relief at source. |
@@ -19,13 +19,13 @@ It works out income tax, National Insurance and pension deductions for a salary 
 
 ## Outputs
 
-1. **Your pay** — gross pay, pension, income tax, National Insurance and take-home pay per year, month (÷ 12) and week (÷ 52).
-2. **Dropping days** — current pattern versus −1, −2 and −3 days, showing days, hours, annual leave (days and hours), gross pay, each deduction, take-home pay, the monthly change, the share of pay worked and the share of take-home pay kept.
+1. **Your pay** - gross pay, pension, income tax, National Insurance and take-home pay per year, month (÷ 12) and week (÷ 52).
+2. **Dropping days** - current pattern versus −1, −2 and −3 days, showing days, hours, annual leave (days and hours), gross pay, each deduction, take-home pay, the monthly change, the share of pay worked and the share of take-home pay kept.
 3. If a retention allowance is entered, the drop-days table appears **twice**: once with the allowance reduced pro rata and once with it kept at its full value, because employers treat it differently.
 
 ## Calculation rules
 
-All figures are for the **2026/27 tax year** (6 April 2026 – 5 April 2027) and use **England, Wales and Northern Ireland** income tax rates.
+All figures are for the **2026/27 tax year** (6 April 2026 - 5 April 2027) and use **England, Wales and Northern Ireland** income tax rates.
 
 ### Gross pay
 
@@ -41,8 +41,8 @@ gross = annual income + retention allowance
 
 | Band | Taxable income | Rate | Equivalent gross income (full allowance) |
 |---|---|---|---|
-| Basic | £0 – £37,700 | 20% | £12,571 – £50,270 |
-| Higher | £37,701 – £125,140 | 40% | £50,271 – £125,140 |
+| Basic | £0 - £37,700 | 20% | £12,571 - £50,270 |
+| Higher | £37,701 - £125,140 | 40% | £50,271 - £125,140 |
 | Additional | over £125,140 | 45% | over £125,140 |
 
 "Taxable pay" is gross pay less any net-pay or salary-sacrifice pension contribution (see below). The personal allowance taper is applied to that same figure.
@@ -52,7 +52,7 @@ gross = annual income + retention allowance
 | Earnings (annual) | Rate |
 |---|---|
 | Up to £12,570 (Primary Threshold) | 0% |
-| £12,570 – £50,270 (Upper Earnings Limit) | 8% |
+| £12,570 - £50,270 (Upper Earnings Limit) | 8% |
 | Over £50,270 | 2% |
 
 NI is calculated on the **annual** figure. Real payroll calculates NI per pay period, so results match exactly only when pay is the same every period.
@@ -121,9 +121,13 @@ All tax and NI values live in the `TAX_YEAR` object at the top of the `<script>`
 |---|---|---|
 | Tax year label, personal allowance, taper threshold, income tax bands and rates | Every year before **6 April**, after the Autumn Budget (usually October/November) and the Spring Statement | [GOV.UK: Income Tax rates and allowances](https://www.gov.uk/government/publications/rates-and-allowances-income-tax) |
 | NI Primary Threshold, Upper Earnings Limit and rates | Every year before **6 April**, and after any fiscal event. NI rates have changed mid-year before (January 2024) | [GOV.UK: Rates and thresholds for employers](https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027) |
-| Relief-at-source rate (uses the basic rate, so it follows the first band automatically) | Only if the basic rate changes | – |
+| Relief-at-source rate (uses the basic rate, so it follows the first band automatically) | Only if the basic rate changes | - |
 | Salary sacrifice NI treatment | Before **6 April 2029**. From 2029/30, only the first £2,000 a year of pension contributions made by salary sacrifice is expected to be exempt from NI; the calculator currently exempts all of it | [GOV.UK: Budget 2025](https://www.gov.uk/government/topical-events/budget-2025) |
-| Default pension contribution (7.35%) | Every April, or when your pay changes. Many schemes (especially public-sector schemes) set the rate by pay tier, and dropping days may move you into a different tier — the calculator keeps the same rate in every scenario | Your pension scheme |
+| Default pension contribution (7.35%) | Every April, or when your pay changes. Many schemes (especially public-sector schemes) set the rate by pay tier, and dropping days may move you into a different tier - the calculator keeps the same rate in every scenario | Your pension scheme |
 | Default annual leave (25 days) and hours (37) | When your contract changes | Your employer |
 
 Income tax thresholds (personal allowance and higher-rate threshold) and the NI thresholds are currently frozen. Even so, check them every year, since freezes can be extended, ended or changed at any fiscal event.
+
+## Disclaimer
+
+This calculator is provided "as is", without warranty of any kind, express or implied. Results are estimates for general guidance only and may contain errors or omissions, or be out of date. They are not financial, tax or legal advice. The authors accept no responsibility or liability for any loss or decision arising from its use. Check figures with your employer, payroll department, pension scheme or HMRC before relying on them.

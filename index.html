@@ -229,11 +229,21 @@
       color: #b91c1c;
       margin: 0;
     }
+
+    .disclaimer {
+      margin-top: 2rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .disclaimer p {
+      margin: 0;
+    }
   </style>
 </head>
 <body>
   <main>
-    <h1>Pay Calculator</h1>
+    <h1>UK Pay Calculator</h1>
 
     <form id="pay-form" class="card" novalidate>
       <div class="field">
@@ -308,6 +318,16 @@
     </form>
 
     <section id="results" aria-live="polite"></section>
+
+    <footer class="disclaimer">
+      <p>
+        This calculator is provided "as is", without warranty of any kind. Results are estimates
+        for general guidance only, may contain errors or be out of date, and are not financial,
+        tax or legal advice. We accept no responsibility or liability for any loss or decision
+        arising from its use. Check figures with your employer, pension scheme or HMRC before
+        relying on them.
+      </p>
+    </footer>
   </main>
 
   <script>
